@@ -10,9 +10,6 @@
 library(shiny)
 library(ggplot2)
 library(colourpicker) 
-library(shinyWidgets)
-library(shinydashboard)
-library(fontawesome)
 library(shinyjs)
 library(tidyverse)
 library(gridExtra)
@@ -100,8 +97,8 @@ ui <- fluidPage(
                     radioButtons("button2", "Choose the column for the y-axis",
                                  c("baseMean", "log2FoldChange",'lfcSE', 'stat', 
                                    'pvalue', 'padj')),
-                    colourpicker::colourInput("col1", "Base point color", "#FFB27F"),
-                    colourpicker::colourInput("col2", "Highlight point color", "#9E0C7E"),
+                    colourpicker::colourInput("col1", "Base point color", "#AAC8E6"),
+                    colourpicker::colourInput("col2", "Highlight point color", "#000000"),
                     sliderInput("slider3",
                                 "Select the magnitude of the p adjusted coloring:",
                                 min = -300,
@@ -137,7 +134,7 @@ ui <- fluidPage(
                               plotOutput("fgsea_barplot")),
                      tabPanel("Table",
                               h4("Filtered table by adjusted p-value"),
-                              markdown("Please upload your file first before filtering or submiting the inputs here!"),
+                              markdown("Please upload your file first before applying changes or pressing the download button!"),
                               radioButtons("NES_button", "Choose to select all postive or negtive NES pathways",
                                            c("postive", "negative")),
                               submitButton("Apply Changes"),
@@ -184,6 +181,8 @@ server <- function(input, output, session) {
   fgsea_filtered <- reactive({
     draw_fgseatable(load_fgseadata(), input$NES_button, input$slider4)
   })
+  
+  
   #' Volcano plot
   #'
   #' @param dataf The loaded data frame.
@@ -208,7 +207,7 @@ server <- function(input, output, session) {
     vp <- dataf %>% as_tibble() %>% 
       ggplot(mapping=aes(x=!!sym(x_name), y=-log10(!!sym(y_name)))) + 
       geom_point(aes(color = padj< 1*10^(slider)))+
-      labs( color = str_glue('{y_name} 1 x 10^ {slider}'))+ 
+      labs( color = str_glue('{y_name} < 1x10^{slider}'))+ 
       theme_minimal() +
       scale_color_manual(values=c(color1, color2))  +
       theme(legend.position="bottom") + 
@@ -244,9 +243,11 @@ server <- function(input, output, session) {
   #' variance values.
   #'
   plot_variance_vs_mean <- function(data, slider_cp, slider_cs) {
-    threshold <- quantile(apply(data[,2:ncol(data)], 1, var), probs = c(slider_cp)) %>% round(3)
-    median <- apply(data[,2:ncol(data)], 1, median)
-    variances <- apply(data[,2:ncol(data)], 1, var) #apply to rows
+    #validate(need(load_countdata))
+    d <- data[,2:ncol(data)]
+    threshold <- quantile(apply(d, 1, var), probs = c(slider_cp)) %>% round(3)
+    median <- apply(d, 1, median)
+    variances <- apply(d, 1, var) #apply to rows
     plot_data <- tibble::tibble(median=median, variance=variances)
     plot_data$rank <- rank(plot_data$median)
     mv_plot <- plot_data %>% 
@@ -262,17 +263,16 @@ server <- function(input, output, session) {
     mv_plot <- mv_plot + ggplot2::scale_y_log10()
     mv_plot
     
-    zero <- rowSums(data==0) #number of zeros
-    plot_data2 <- tibble::tibble(median=median, zeros=zero)
+    nonzero <- rowSums(d!=0) #number of zeros
+    plot_data2 <- tibble::tibble(median=median, nonzeros=nonzero)
     plot_data2$rank <- rank(plot_data2$median)
     mv_plot2 <- plot_data2 %>% 
-      ggplot(aes(x=rank, y=zeros, color=zeros < slider_cs)) +
-      labs(color = str_glue('zeros < {slider_cs}'))+
+      ggplot(aes(x=rank, y=nonzeros, color=nonzeros > slider_cs)) +
+      labs(color = str_glue('Nonzeros > {slider_cs}'))+
       ggplot2::geom_point(alpha=0.5) +
-      ggplot2::geom_smooth(method = 'gam', formula = y ~ s(x, bs = "cs")) + 
       ggplot2::xlab("Rank(Median)") + 
-      ggplot2::ylab("Zeros") + 
-      ggplot2::ggtitle("Zeros vs. Median(Raw Counts)") + 
+      ggplot2::ylab("NonZeros") + 
+      ggplot2::ggtitle("NonZeros vs. Median(Raw Counts)") + 
       scale_color_manual(values=c("gray", "black"))
     mv_plot2
     
@@ -290,10 +290,11 @@ server <- function(input, output, session) {
   #' @return A heatmap displaying the intensity values for the highly variable counts
   #'
   plot_heatmap <- function(data, slider_cp, slider_cs) {
+    data_copy <- data
     x <- data[,2:ncol(data)]
     samples <- colnames(x)
     group <- substr(samples, 1, 5) %>% factor()
-    genes <- as.data.frame(data[,1:2])
+    genes <- as.data.frame(data_copy[,1:2])
     y <- DGEList(counts=x,group=group, genes=genes)
     keep <- filterByExpr(y)
     y <- y[keep,,keep.lib.sizes=FALSE]
@@ -320,7 +321,8 @@ server <- function(input, output, session) {
   #' @return dataframe of PCA results
   #'
   pca_results <- function(data) {
-    data <- as.data.frame(data)
+    data_copy <- data
+    data_copy <- as.data.frame(data_copy)
     rownames(data) <- data$Gene_id
     data <- subset(data, select = -c(1) )
     t_data <- t(data) #transpose data so samples are on rows and genes are columns 
@@ -448,14 +450,15 @@ server <- function(input, output, session) {
   #' of variance and samples that are non-zeros
   draw_countsTable <- function(data, slider_cp, slider_cs){
     #get total number of genes and samples 
-    gene_no <- nrow(data)
-    sample_no <- ncol(data) - 1
+    d2 <- data
+    gene_no <- nrow(d2)
+    sample_no <- ncol(d2) - 1
     
     #exclude first two columns which are gene ids and symbols
-    data <-data[,2:ncol(data)] #remove first two columns (Gene_id, Gene_symbol)
+    d1 <- d2[,2:ncol(d2)]#reactive value.. 
     #filter genes using variance 
-    threshold <- quantile(apply(data, 1, var), probs = c(slider_cp))
-    new_data <- data[(apply(data, 1, var)) > threshold, ]
+    threshold <- quantile(apply(d1, 1, var), probs = c(slider_cp))
+    new_data <- d1[(apply(d1, 1, var)) > threshold, ]
     
     # filter genes using samples using nonzeros
     new_data <- new_data[rowSums(new_data!=0)>slider_cs, ]
@@ -484,14 +487,15 @@ server <- function(input, output, session) {
         return(paste(formatC(m), " +/-",formatC(std)))
       }
     }
-    data[sapply(data, is.character)] <- lapply(data[sapply(data, is.character)], as.factor)
-    data$Tag <- factor(data$Tag)
+    metadata <- data
+    metadata[sapply(metadata, is.character)] <- lapply(metadata[sapply(metadata, is.character)], as.factor)
+    metadata$Tag <- factor(metadata$Tag)
     
     Type <- c("Factor", "Factor", "Factor", "Factor", "Factor", "Factor", "num", "num", "num")
     
-    Information <- sapply(data, get_coldata)
+    Information <- sapply(metadata, get_coldata)
     
-    samples <- tibble(Columns = colnames(data))
+    samples <- tibble(Columns = colnames(metadata))
     samples <- cbind(samples, Type)
     samples <- cbind(samples, Information)
     return(samples)
