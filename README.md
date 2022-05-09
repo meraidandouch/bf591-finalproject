@@ -20,4 +20,4 @@ The app can be broken into four parts:
 - Making input choices more dynamic and not show up before user has uploaded their files! For example, in the counts tab, the Heatmap and PCA plots are not interative. Additionally, the GSEA table tab allows useres to download data before they have uploaded their file. 
 - Column data types in the Samples tab are manually entered and future work should include automating this process 
 
-**Reference**: Hérault, F., Houée-Bigot, M., Baéza, E., Bouchez, O., Esquerré, D., Klopp, C. and Diot, C., 2019. RNA-seq analysis of hepatic gene expression of common Pekin, Muscovy, mule and hinny ducks fed ad libitum or overfed. BMC genomics, 20(1), pp.1-14.<img width="1494" alt="Screen Shot 2022-
+**Reference**: Hérault, F., Houée-Bigot, M., Baéza, E., Bouchez, O., Esquerré, D., Klopp, C. and Diot, C., 2019. RNA-seq analysis of hepatic gene expression of common Pekin, Muscovy, mule and hinny ducks fed ad libitum or overfed. BMC genomics, 20(1), pp.1-14.
