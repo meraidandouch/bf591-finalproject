@@ -12,5 +12,6 @@ Things I still need to work on:
 - Heatmap shows only top highly variable 30 gene counts and does not interact with user input 
 - Error display in samples and Counts tabe when first loading up the app 
 - Making input choices more dynamic and not showing up before user has uploaded their files!
+- Column data types are manually entered and future work should include automating this process 
 
 **Reference**: Hérault, F., Houée-Bigot, M., Baéza, E., Bouchez, O., Esquerré, D., Klopp, C. and Diot, C., 2019. RNA-seq analysis of hepatic gene expression of common Pekin, Muscovy, mule and hinny ducks fed ad libitum or overfed. BMC genomics, 20(1), pp.1-14.
