@@ -5,19 +5,18 @@ This RShiny app attempts to summarize RNASeq bioinformatics studies and processe
 The app can be broken into four parts: 
 1. **Samples** - This tab allows users to explore metadata through a series of functionalities such as viewing the summary table, entire sortable data-table and density plot of sample groups. 
   - <img width="1486" alt="Screen Shot 2022-05-09 at 11 29 22 AM" src="https://user-images.githubusercontent.com/16998734/167444518-b8d3385c-0158-4b59-94d6-e87a8dbce60c.png">
-
 3. **Counts** - After uploading raw read counts data here, users will have access to a plethora of plots (diagnostic scatter plot, clustered heatmap, PCA) that they can interact with by adjusting percentile of gene count variance and number of nonzero gene counts. 
   - <img width="1484" alt="Screen Shot 2022-05-09 at 11 29 31 AM" src="https://user-images.githubusercontent.com/16998734/167444535-b83b11ed-4504-47e5-bf85-96fc4f49c44f.png">
-
 5. **DeSeq** - Differential expression identifies which genes, if any, are implicated in a specific biological comparison. This component allows the user to load and explore a differential expression dataset.
   - <img width="1482" alt="Screen Shot 2022-05-09 at 11 29 48 AM" src="https://user-images.githubusercontent.com/16998734/167444544-dd3511cf-6bb3-4a9e-9277-05c0e40287bb.png">
  
 7. **FGSEA** - A table of fgsea results from the differential expression data is displayed in this tab, along with a barplot of fgsea NES for top pathways selected by slider, scatter plot of NES on x-axis and -log10 adjusted p-value on y-axis, with gene sets below threshold in grey color, and a download-able current filtered table results.
   - <img width="1494" alt="Screen Shot 2022-05-09 at 11 29 58 AM" src="https://user-images.githubusercontent.com/16998734/167444558-4b14d983-f567-4598-9526-fd37e3b9b2de.png">
-
+ 
 Things I still need to work on: 
 - Heatmap shows only top highly variable 30 gene counts and does not interact with user input  
-- Making input choices more dynamic and not showing up before user has uploaded their files!
+- Making input choices more dynamic and not show up before user has uploaded their files! For example, in the counts tab, the Heatmap and PCA plots are not interative. Additionally, the GSEA table tab allows useres to download data before they have uploaded their file. 
 - Column data types in the Samples tab are manually entered and future work should include automating this process 
+\
 
 **Reference**: Hérault, F., Houée-Bigot, M., Baéza, E., Bouchez, O., Esquerré, D., Klopp, C. and Diot, C., 2019. RNA-seq analysis of hepatic gene expression of common Pekin, Muscovy, mule and hinny ducks fed ad libitum or overfed. BMC genomics, 20(1), pp.1-14.<img width="1494" alt="Screen Shot 2022-
