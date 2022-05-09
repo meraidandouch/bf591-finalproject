@@ -5,8 +5,10 @@ This RShiny app attempts to summarize RNASeq bioinformatics studies and processe
 The app can be broken into four parts: 
 1. **Samples** - This tab allows users to explore metadata through a series of functionalities such as viewing the summary table, entire sortable data-table and density plot of sample groups. 
 <img width="1486" alt="Screen Shot 2022-05-09 at 11 29 22 AM" src="https://user-images.githubusercontent.com/16998734/167444518-b8d3385c-0158-4b59-94d6-e87a8dbce60c.png">
+
 3. **Counts** - After uploading raw read counts data here, users will have access to a plethora of plots (diagnostic scatter plot, clustered heatmap, PCA) that they can interact with by adjusting percentile of gene count variance and number of nonzero gene counts. 
 <img width="1484" alt="Screen Shot 2022-05-09 at 11 29 31 AM" src="https://user-images.githubusercontent.com/16998734/167444535-b83b11ed-4504-47e5-bf85-96fc4f49c44f.png">
+
 5. **DeSeq** - Differential expression identifies which genes, if any, are implicated in a specific biological comparison. This component allows the user to load and explore a differential expression dataset.
   - <img width="1482" alt="Screen Shot 2022-05-09 at 11 29 48 AM" src="https://user-images.githubusercontent.com/16998734/167444544-dd3511cf-6bb3-4a9e-9277-05c0e40287bb.png">
  
